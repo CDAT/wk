@@ -1,2 +1,2 @@
-from process import WK
-from plot import WKPlot
+from process import WK  # noqa
+from plot import WKPlot  # noqa
