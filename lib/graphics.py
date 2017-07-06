@@ -3,8 +3,8 @@ import vcs
 import numpy
 
 
-def createTemplateandGM(x, min, max, deltaisof, deltaisol,
-                        days_line, ntemplate=1, orientation='landscape'):
+def createTemplateandGM(x, min, max, deltaisof=None, deltaisol=None,
+                        days_line=(30, 6, 3, 2,), ntemplate=1, orientation='landscape'):
 
     # x.scriptrun('resol_24.scr')
     # x.setcolormap('cmap')
@@ -52,8 +52,6 @@ def createTemplateandGM(x, min, max, deltaisof, deltaisol,
     tmpl.dataname.y = tmpl.data.y2 + .03
     tmpl.dataname.textorientation = to
 
-    tmpl.legend.x1 = .3
-    tmpl.legend.x2 = .7
 
     tmpl.yname.x = tmpl.yname.x - .01
     tmpl.xname.y = tmpl.xname.y - .075
@@ -63,17 +61,29 @@ def createTemplateandGM(x, min, max, deltaisof, deltaisol,
     tmpl.xtic2.line = dot
     tmpl.scalefont(.8)
 
+    tmpl.legend.x1 = tmpl.data.x1*1.1
+    tmpl.legend.x2 = tmpl.data.x2*.985
+
     tmplnoleg = x.createtemplate(source=tmpl.name)
     tmplnoleg.legend.priority = 0
     isof = x.createisofill()
-    levs2 = list(numpy.arange(min, max, deltaisof))
-    levs1a = list(numpy.arange(min, 0, deltaisol))
-    levs1b = list(numpy.arange(0, max, deltaisol))
+    if deltaisof is None:
+        levs2 = vcs.mkscale(min,max)
+    else:
+        levs2 = list(numpy.arange(min,max,deltaisof))
+        for i,v in enumerate(levs2):
+            if numpy.allclose(v,0.):
+                levs2[i] = 0.
+    if deltaisol is None:
+        levs1a = vcs.mkscale(min, 0)
+        levs1b = vcs.mkscale(0, max)
+    else:
+        levs1a = list(numpy.arange(min, 0, deltaisol))
+        levs1b = list(numpy.arange(0, max, deltaisol))
     isof.levels = levs2
     colors = vcs.getcolors(levs2, colors=range(16, 40), white="white")
-    white = colors.index([255, 255, 255])
-    colors.pop(white)
-    colors.insert(white, "white")
+    lbls = vcs.mklabels(levs2)
+    isof.legend = lbls
     isof.fillareacolors = colors
 
     levs1a = list(numpy.arange(min, 0, deltaisol))
@@ -82,7 +92,7 @@ def createTemplateandGM(x, min, max, deltaisof, deltaisol,
     isol1 = x.createisoline()
     isol1.level = levs1a
     isol1.label = 'y'
-    isol1.line = ['dot']
+    isol1.linetypes = ['dot']
     isol2 = x.createisoline()
     isol2.level = levs1b
     isol2.label = 'y'
@@ -101,6 +111,7 @@ def createTemplateandGM(x, min, max, deltaisof, deltaisol,
         gm.datawc_y2 = .8
         gm.yticlabels2 = tick2
         gm.xticlabels2 = tick1
+
     return tmpl, tmplnoleg, isof, isol1, isol2
 
 
