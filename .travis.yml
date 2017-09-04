@@ -7,7 +7,6 @@ before_install:
 - export PATH="$HOME/miniconda/bin:$PATH"
 - bash miniconda.sh -b -p $HOME/miniconda
 - conda config --set always_yes yes --set changeps1 no
-- conda install -f -y -q "conda<4.3.13"
 script:
 - conda install -c uvcdat/label/nightly -c conda-forge -c uvcdat nose vcs vcsaddons dv3d image-compare "mesalib=17.1.4=3" flake8
 - export UVCDAT_ANONYMOUS_LOG=False
