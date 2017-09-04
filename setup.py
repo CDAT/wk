@@ -6,6 +6,7 @@ setup (name = "WK",
        description = "Package compute and draw the Wheeler-Koladis figures",
        url = "http://cdat.sf.net, see WK 99",
        packages = ['WK'],
-       package_dir = {'WK': 'Lib'},
+       package_dir = {'WK': 'lib'},
+       data_files = [("share/wk",["share/test_data_files.txt"])],
        
       )
