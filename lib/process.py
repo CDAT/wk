@@ -5,7 +5,7 @@ import genutil
 import cdms2
 import numpy
 import MV2
-import graphics
+from . import graphics
 
 
 class WK(object):
@@ -100,7 +100,7 @@ class WK(object):
         # length of time axis
         nt = len(t)
         if nt % 2 != 0:
-            print "Warning time wasn't even, removed last time step"
+            print("Warning time wasn't even, removed last time step")
             data = data[:-1]
             t = data.getTime()  # get the new time axis
             nt = len(t)
@@ -295,7 +295,7 @@ class WK(object):
         """
         id = S.id.split("_")[0]
         power = (S + A) / 2.
-        trans = range(power.rank())
+        trans = list(range(power.rank()))
         trans[0] = 1
         trans[1] = 0
         # Puts wave number first
@@ -419,7 +419,7 @@ def symetrick(slab, axis='y'):
         tmp.setAxis(i, H1.getAxis(i))
     tmp.setAxis(0, ax)
     tmp.id = slab.id
-    for a in slab.attributes.keys():
+    for a in list(slab.attributes.keys()):
         setattr(tmp, a, getattr(slab, a))
     return tmp(order=slab.getOrder(ids=1))
 

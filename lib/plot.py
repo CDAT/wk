@@ -1,6 +1,6 @@
 # Adapted for numpy/ma/cdms2 by convertcdms.py
 # Wheeler Koladis Reproduction Package
-import graphics
+from . import graphics
 import vcs
 import MV2
 import numpy

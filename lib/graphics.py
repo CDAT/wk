@@ -81,7 +81,7 @@ def createTemplateandGM(x, min, max, deltaisof=None, deltaisol=None,
         levs1a = list(numpy.arange(min, 0, deltaisol))
         levs1b = list(numpy.arange(0, max, deltaisol))
     isof.levels = levs2
-    colors = vcs.getcolors(levs2, colors=range(16, 40), white="white")
+    colors = vcs.getcolors(levs2, colors=list(range(16, 40)), white="white")
     lbls = vcs.mklabels(levs2)
     isof.legend = lbls
     isof.fillareacolors = colors
@@ -135,7 +135,7 @@ def mask_power(power, wvnb, fqcy):
             ifq = i
             break
     if ifq == -1:
-        print 'Could not find frequency:' + str(fqcy)
+        print('Could not find frequency:' + str(fqcy))
     else:
         power[ifq, iw] = -999
     power = MV2.masked_equal(power, -999)

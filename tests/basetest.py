@@ -56,8 +56,8 @@ class BaseGraphicsTest(TestCase):
             src = os.path.join(self.basedir,os.path.basename(fnm))
         if not pngPathSet:
             fnm = os.path.join(self.pngsdir,fnm)
-        print "Test file  :",fnm
-        print "Source file:",src
+        print("Test file  :",fnm)
+        print("Source file:",src)
         if not pngReady:
             self.x.png(fnm,width=self.x.bgX,height=self.x.bgY,units="pixels")
         ret = checkimage.check_result_image(fnm,src,threshold)
