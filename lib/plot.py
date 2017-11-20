@@ -92,7 +92,6 @@ class WKPlot(object):
             w = power.getAxis(1)
             w.id = 'Westward     Zonal Wave Number     Eastward'
 
-
             displays.append(x.plot(power, isof, templ, bg=bg))
             displays.append(x.plot(power, isol1, templnoleg, bg=bg))
             displays.append(x.plot(power, isol2, templnoleg, bg=bg))
@@ -216,9 +215,9 @@ class WKPlot(object):
 
         # Ok now the curves
         # First the graphic stuff
-        l = x.createline()
-        l.width = 2
-        l.color = ["grey"]
+        ln_tmp = x.createline()
+        ln_tmp.width = 2
+        ln_tmp.color = ["grey"]
 
         yx = x.createyxvsx()
         yx.datawc_x1 = isol1.datawc_x1
@@ -229,9 +228,9 @@ class WKPlot(object):
         yx.yticlabels1 = {}
         yx.xticlabels2 = {}
         yx.yticlabels2 = {}
-        yx.linewidth = l.width[0]
-        yx.linecolor = l.color[0]
-        yx.linetype = l.type[0]
+        yx.linewidth = ln_tmp.width[0]
+        yx.linecolor = ln_tmp.color[0]
+        yx.linetype = ln_tmp.type[0]
         yx.marker = 1
         yx.markersize = 1
         yx.markercolor = "grey"
@@ -319,7 +318,6 @@ class WKPlot(object):
                             'ccb'),
                         squeeze=1))]
             t.height = 15
-            #t.fillincolor = "grey"
             t.worldcoordinate = [
                 yx.datawc_x1,
                 yx.datawc_x2,
@@ -331,7 +329,7 @@ class WKPlot(object):
                 tmpl.data.y1,
                 tmpl.data.y2]
             t.priority = 2
-            t.color ="grey"
+            t.color = "grey"
             displays.append(x.plot(t, bg=bg))
             xx = 0
             t = x.createtext(Tt_source=t.Tt_name, To_source=t.To_name)
@@ -557,7 +555,6 @@ class WKPlot(object):
         tt.height = 25
         tt.string = [title, ]
         displays.append(x.plot(tt, bg=bg))
-        #x.update()
         return displays
 
 

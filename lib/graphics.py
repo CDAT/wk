@@ -52,7 +52,6 @@ def createTemplateandGM(x, min, max, deltaisof=None, deltaisol=None,
     tmpl.dataname.y = tmpl.data.y2 + .03
     tmpl.dataname.textorientation = to
 
-
     tmpl.yname.x = tmpl.yname.x - .01
     tmpl.xname.y = tmpl.xname.y - .075
 
@@ -61,18 +60,18 @@ def createTemplateandGM(x, min, max, deltaisof=None, deltaisol=None,
     tmpl.xtic2.line = dot
     tmpl.scalefont(.8)
 
-    tmpl.legend.x1 = tmpl.data.x1*1.1
-    tmpl.legend.x2 = tmpl.data.x2*.985
+    tmpl.legend.x1 = tmpl.data.x1 * 1.1
+    tmpl.legend.x2 = tmpl.data.x2 * .985
 
     tmplnoleg = x.createtemplate(source=tmpl.name)
     tmplnoleg.legend.priority = 0
     isof = x.createisofill()
     if deltaisof is None:
-        levs2 = vcs.mkscale(min,max)
+        levs2 = vcs.mkscale(min, max)
     else:
-        levs2 = list(numpy.arange(min,max,deltaisof))
-        for i,v in enumerate(levs2):
-            if numpy.allclose(v,0.):
+        levs2 = list(numpy.arange(min, max, deltaisof))
+        for i, v in enumerate(levs2):
+            if numpy.allclose(v, 0.):
                 levs2[i] = 0.
     if deltaisol is None:
         levs1a = vcs.mkscale(min, 0)
