@@ -1,11 +1,12 @@
 # Adapted for numpy/ma/cdms2 by convertcdms.py
 # Wheeler Koladis Reproduction Package
+from __future__ import division
 import cdutil
 import genutil
 import cdms2
 import numpy
 import MV2
-import graphics
+from . import graphics
 
 
 class WK(object):
@@ -30,13 +31,10 @@ class WK(object):
         return
 
     __slots__ = [
-        'frequency',
         '_frequency',
         '_NShift',
         '_NTSub',
-        'shift',
         '_shift',
-        'number_of_days',
         '_number_of_days',
         'tkbar',
         'symetric',
@@ -100,7 +98,7 @@ class WK(object):
         # length of time axis
         nt = len(t)
         if nt % 2 != 0:
-            print "Warning time wasn't even, removed last time step"
+            print("Warning time wasn't even, removed last time step")
             data = data[:-1]
             t = data.getTime()  # get the new time axis
             nt = len(t)
@@ -108,7 +106,11 @@ class WK(object):
         if len(t) < self._NTSub:
             msg = "Error your data must have at least %i time steps, adjust frequency (currently: %i/day)"
             msg += " or number_of_days (currently: %i processed at once) to reach that limit, or get more data"
-            raise Exception(msg % (self._NTSub, self.frequency, self.number_of_days))
+            raise Exception(
+                msg %
+                (self._NTSub,
+                 self.frequency,
+                 self.number_of_days))
         # Computes PP, number of sub-domain
         PP = float(nt - self._NTSub) / self._NShift + 1
         PP = int(PP)
@@ -187,16 +189,16 @@ class WK(object):
             EE = numpy.fft.fft2(EE, axes=(1, 0)) / NL / self._NTSub
 
             # OK NOW THE LITTLE MAGIC WITH REORDERING !
-            A = numpy.absolute(EE[0:self._NTSub / 2 + 1, 1:NL / 2 + 1])**2
+            A = numpy.absolute(EE[0:self._NTSub // 2 + 1, 1:NL // 2 + 1])**2
             B = numpy.absolute(
-                EE[self._NTSub / 2:self._NTSub, 1:NL / 2 + 1])**2
+                EE[self._NTSub // 2:self._NTSub, 1:NL // 2 + 1])**2
             C = numpy.absolute(
-                EE[self._NTSub / 2:self._NTSub, 0:NL / 2 + 1])**2
-            D = numpy.absolute(EE[0:self._NTSub / 2 + 1, 0:NL / 2 + 1])**2
-            Power[Pcount, self._NTSub / 2:, :NL / 2] = A[:, ::-1]
-            Power[Pcount, :self._NTSub / 2, :NL / 2] = B[:, ::-1]
-            Power[Pcount, self._NTSub / 2 + 1:, NL / 2:] = C[::-1, :]
-            Power[Pcount, :self._NTSub / 2 + 1, NL / 2:] = D[::-1, :]
+                EE[self._NTSub // 2:self._NTSub, 0:NL // 2 + 1])**2
+            D = numpy.absolute(EE[0:self._NTSub // 2 + 1, 0:NL // 2 + 1])**2
+            Power[Pcount, self._NTSub // 2:, :NL // 2] = A[:, ::-1]
+            Power[Pcount, :self._NTSub // 2, :NL // 2] = B[:, ::-1]
+            Power[Pcount, self._NTSub // 2 + 1:, NL // 2:] = C[::-1, :]
+            Power[Pcount, :self._NTSub // 2 + 1, NL // 2:] = D[::-1, :]
         # End of Pcount loop
         if self.tkbar and PP > 1:
             prev[1].destroy()
@@ -295,7 +297,7 @@ class WK(object):
         """
         id = S.id.split("_")[0]
         power = (S + A) / 2.
-        trans = range(power.rank())
+        trans = list(range(power.rank()))
         trans[0] = 1
         trans[1] = 0
         # Puts wave number first
@@ -401,25 +403,25 @@ def symetrick(slab, axis='y'):
     tmp.setAxisList(slab.getAxisList())
     tmp = tmp(order=str(axis) + '...')
     if n % 2 == 0:
-        H1 = tmp[:n / 2]
+        H1 = tmp[:n // 2]
     else:
-        H1 = tmp[:n / 2 + 1]
-    H2 = tmp[n / 2:]
+        H1 = tmp[:n // 2 + 1]
+    H2 = tmp[n // 2:]
     H1 = H1[::-1]
     sym = (H1 + H2) / 2.
     anti = (H2 - H1) / 2.
     if n % 2 == 0:
-        tmp[:n / 2] = sym[::-1]
-        tmp[n / 2:] = anti
+        tmp[:n // 2] = sym[::-1]
+        tmp[n // 2:] = anti
     else:
-        tmp[:n / 2 + 1] = sym[::-1]
-        tmp[n / 2 + 1:] = anti[1:]
+        tmp[:n // 2 + 1] = sym[::-1]
+        tmp[n // 2 + 1:] = anti[1:]
     sh = tmp.shape
     for i in range(1, len(sh)):
         tmp.setAxis(i, H1.getAxis(i))
     tmp.setAxis(0, ax)
     tmp.id = slab.id
-    for a in slab.attributes.keys():
+    for a in list(slab.attributes.keys()):
         setattr(tmp, a, getattr(slab, a))
     return tmp(order=slab.getOrder(ids=1))
 
