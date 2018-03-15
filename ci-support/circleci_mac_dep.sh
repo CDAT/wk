@@ -2,8 +2,8 @@
 ls
 pwd
 export PATH=${HOME}/miniconda/bin:${PATH}
-conda create -q -n py3 -c cdat/label/nightly -c uvcdat/label/nightly -c nesii/label/dev-esmf -c conda-forge -c uvcdat cdms2 nose flake8 "python>3" mesalib image-compare matplotlib numpy=1.13 vcs
-conda create -q -n py2 -c cdat/label/nightly -c uvcdat/label/nightly -c nesii/label/dev-esmf -c conda-forge -c uvcdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs
+conda create -q -n py3 -c cdat/label/nightly -c nesii/label/dev-esmf -c conda-forge -c uvcdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs "python>3"
+conda create -q -n py2 -c cdat/label/nightly -c nesii/label/dev-esmf -c conda-forge -c uvcdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs "python<3"
 export UVCDAT_ANONYMOUS_LOG=False
 source activate py2
 python setup.py install
