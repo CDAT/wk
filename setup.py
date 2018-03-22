@@ -2,8 +2,8 @@
 from distutils.core import setup
 
 setup (name = "WK",
-       version='1.0',
-       description = "Package compute and draw the Wheeler-Koladis figures",
+       version='8.0',
+       description = "Package to compute and draw the Wheeler-Kiladis figures",
        url = "http://cdat.sf.net, see WK 99",
        packages = ['WK'],
        package_dir = {'WK': 'lib'},
