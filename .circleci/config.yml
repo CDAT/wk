@@ -34,6 +34,7 @@ aliases:
   - &setup_wk
     name: setup_wk
     command: |
+       export PATH=$WORKDIR/miniconda/bin:$PATH
        export UVCDAT_ANONYMOUS_LOG=False
        source activate py3
        python setup.py install
