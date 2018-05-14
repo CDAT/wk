@@ -59,7 +59,7 @@ aliases:
   - &conda_upload
     name: conda_upload
     command: |
-       if [[ $CIRCLE_BRANCH != 'migrateToCircleCI' ]]; then
+       if [[ $CIRCLE_BRANCH != 'master' ]]; then
           exit 0
        fi
        export PATH=${HOME}/project/$WORKDIR/miniconda/bin:$PATH
@@ -123,8 +123,9 @@ jobs:
 
 workflows:
   version: 2
-    wk:
-      jobs:
-        - macos_wk
+  wk:
+    jobs:
+      - macos_wk
+      - linux_wk
 
        
