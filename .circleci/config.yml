@@ -20,8 +20,8 @@ aliases:
        conda config --set always_yes yes --set changeps1 no
        conda update -y -q conda
        conda config --set anaconda_upload no
-       conda create -q -n py2 -c cdat/label/nightly -c nesii/label/dev-esmf -c conda-forge -c cdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs "proj4<5" "python<3"
-       conda create -q -n py3 -c cdat/label/nightly -c nesii/label/dev-esmf -c conda-forge -c cdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs "proj4<5" "python<3"
+       conda create -q -n py2 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs "proj4<5" "python<3"
+       conda create -q -n py3 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 nose flake8 mesalib image-compare matplotlib numpy=1.13 vcs "proj4<5" "python<3"
 
   - &get_testdata
     name: get_testdata
@@ -54,6 +54,7 @@ aliases:
        PY3_RESULT=$?
        echo "*** py3 test result: "${PY3_RESULT}
        RESULT=$(( $RESULT + $PY3_RESULT))
+       ls -l 
        exit $RESULT
 
   - &conda_upload
