@@ -21,7 +21,7 @@ aliases:
        conda update -y -q conda
        conda config --set anaconda_upload no
        conda create -q -n py2 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.13 vcs "proj4<5" "python<3"
-       conda create -q -n py3 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.13 vcs "proj4<5" "python<3"
+       conda create -q -n py3 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.13 vcs "proj4<5" "python>3"
 
   - &get_testdata
     name: get_testdata
@@ -48,7 +48,7 @@ aliases:
        source activate py2
        python run_tests.py -v2 -n 2 -H
        RESULT=$?
-       echo "**** py2 test result: "${RESULT}
+       echo "*** py2 test result: "${RESULT}
        source activate py3
        python run_tests.py -n 2 -H
        PY3_RESULT=$?
