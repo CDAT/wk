@@ -20,14 +20,8 @@ aliases:
        conda config --set always_yes yes --set changeps1 no
        conda update -y -q conda
        conda config --set anaconda_upload no
-       conda create -q -n py2 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.13 vcs "proj4<5" "python<3"
-       conda create -q -n py3 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.13 vcs "proj4<5" "python>3"
-
-  - &get_testdata
-    name: get_testdata
-    command: | 
-      ls -l  workspace
-      git clone git://github.com/cdat/uvcdat-testdata
+       conda create -q -n py2 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python<3"
+       conda create -q -n py3 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python>3"
 
   - &setup_wk
     name: setup_wk
@@ -88,7 +82,6 @@ jobs:
     steps:
       - checkout
       - run: *setup_miniconda
-      - run: *get_testdata
       - run: *create_conda_env
       - run: *setup_wk
       - run: *run_wk_tests
@@ -109,7 +102,6 @@ jobs:
     steps:
       - checkout
       - run: *setup_miniconda
-      - run: *get_testdata
       - run: *create_conda_env
       - run: *setup_wk
       - run: *run_wk_tests
