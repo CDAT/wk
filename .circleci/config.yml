@@ -20,8 +20,8 @@ aliases:
        conda config --set always_yes yes --set changeps1 no
        conda update -y -q conda
        conda config --set anaconda_upload no
-       conda create -q -n py2 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python<3"
-       conda create -q -n py3 -c cdat/label/linatest -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python>3"
+       conda create -q -n py2 -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python<3"
+       conda create -q -n py3 -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python>3"
 
   - &setup_wk
     name: setup_wk
