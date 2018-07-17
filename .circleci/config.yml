@@ -1,0 +1,124 @@
+version: 2
+
+checkout:
+  post:
+    - ./ci-support/checkout_merge_commit.sh
+        
+aliases:
+
+  - &setup_miniconda
+    name: setup_miniconda
+    command: |
+      mkdir -p workspace
+      git clone -b validateNightly --depth 1 git@github.com:CDAT/cdat workspace/cdat
+      python workspace/cdat/scripts/install_miniconda.py -w $WORKDIR -p 'py3'
+      
+  - &create_conda_env
+    name: create_conda_env
+    command: |
+       export PATH=$WORKDIR/miniconda/bin:$PATH
+       conda config --set always_yes yes --set changeps1 no
+       conda update -y -q conda
+       conda config --set anaconda_upload no
+       conda create -q -n py2 -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python<3"
+       conda create -q -n py3 -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python>3"
+
+  - &setup_wk
+    name: setup_wk
+    command: |
+       export PATH=$WORKDIR/miniconda/bin:$PATH
+       export UVCDAT_ANONYMOUS_LOG=False
+       source activate py3
+       python setup.py install
+       source activate py2
+       rm -rf build
+       python setup.py install
+
+  - &run_wk_tests
+    name: run_wk_tests
+    command: |
+       export PATH=$WORKDIR/miniconda/bin:$PATH
+       export UVCDAT_ANONYMOUS_LOG=False
+       source activate py2
+       python run_tests.py -v2 -n 2 -H
+       RESULT=$?
+       echo "*** py2 test result: "${RESULT}
+       source activate py3
+       python run_tests.py -n 2 -H
+       PY3_RESULT=$?
+       echo "*** py3 test result: "${PY3_RESULT}
+       RESULT=$(( $RESULT + $PY3_RESULT))
+       ls -al 
+       exit $RESULT
+
+  - &conda_upload
+    name: conda_upload
+    command: |
+       if [[ $CIRCLE_BRANCH != 'master' ]]; then
+          exit 0
+       fi
+       export PATH=${HOME}/project/$WORKDIR/miniconda/bin:$PATH
+       conda install conda-build anaconda-client
+       conda config --set anaconda_upload no
+       export CONDA_BLD_PATH=`pwd`/conda_build
+       git clone git://github.com/cdat/conda-recipes
+       cd conda-recipes
+       export PKG_NAME=wk
+       export USER=cdat
+       export VERSION=8.0
+       export LABEL=nightly
+       python ./prep_for_build.py -l $VERSION
+       conda build $PKG_NAME -c cdat/label/nightly -c conda-forge -c cdat
+       anaconda -t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL $CONDA_BLD_PATH/$OS/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
+
+
+jobs:
+  macos_wk:
+    macos:
+      xcode: "9.2.0"
+    environment:
+      WORKDIR: "workspace/test_macos_wk"
+      OS: "osx-64"
+    steps:
+      - checkout
+      - run: *setup_miniconda
+      - run: *create_conda_env
+      - run: *setup_wk
+      - run: *run_wk_tests
+      - run: *conda_upload
+      - store_artifacts:
+          path: tests_html
+          destination: tests_html
+      - store_artifacts:
+          path: tests_png
+          destination: tests_png
+
+  linux_wk:
+    machine:
+      image: circleci/classic:latest 
+    environment:
+      WORKDIR: "workspace/test_linux_wk"
+      OS: "linux-64"
+    steps:
+      - checkout
+      - run: *setup_miniconda
+      - run: *create_conda_env
+      - run: *setup_wk
+      - run: *run_wk_tests
+      - run: *conda_upload
+      - store_artifacts:
+          path: tests_html
+          destination: tests_html
+      - store_artifacts:
+          path: tests_png
+          destination: tests_png
+
+
+workflows:
+  version: 2
+  wk:
+    jobs:
+      - macos_wk
+      - linux_wk
+
+       
