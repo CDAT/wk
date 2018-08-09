@@ -50,7 +50,6 @@ aliases:
        PY3_RESULT=$?
        echo "*** py3 test result: "${PY3_RESULT}
        RESULT=$(( $RESULT + $PY3_RESULT))
-       ls -al 
        exit $RESULT
 
   - &conda_upload
