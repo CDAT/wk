@@ -26,6 +26,7 @@ aliases:
           conda create -q -n $PY_VER $CHANNELS $PKGS "python<3"
        else
           conda create -q -n $PY_VER $CHANNELS $PKGS "python>3" coverage coveralls
+       fi
        conda install -n py2 -c cdat/label/linatest testsrunner
        conda install -n py3 -c cdat/label/linatest testsrunner
 
@@ -167,7 +168,6 @@ jobs:
       - store_artifacts:
           path: tests_png
           destination: tests_png
-
 
 workflows:
   version: 2
