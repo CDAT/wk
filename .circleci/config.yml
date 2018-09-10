@@ -15,13 +15,17 @@ aliases:
       
   - &create_conda_env
     name: create_conda_env
+       PKGS: "cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs 'proj4<5'"
+       CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
     command: |
        export PATH=$WORKDIR/miniconda/bin:$PATH
        conda config --set always_yes yes --set changeps1 no
        conda update -y -q conda
        conda config --set anaconda_upload no
-       conda create -q -n py2 -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python<3"
-       conda create -q -n py3 -c cdat/label/nightly -c conda-forge -c cdat cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs "proj4<5" "python>3" coverage coveralls
+       if [[ $PY_VER = 'py2' ]]; then
+          conda create -q -n $PY_VER $CHANNELS $PKGS "python<3"
+       else
+          conda create -q -n $PY_VER $CHANNELS $PKGS "python>3" coverage coveralls
        conda install -n py2 -c cdat/label/linatest testsrunner
        conda install -n py3 -c cdat/label/linatest testsrunner
 
@@ -29,33 +33,33 @@ aliases:
     name: setup_wk
     command: |
        export PATH=$WORKDIR/miniconda/bin:$PATH
-       export UVCDAT_ANONYMOUS_LOG=False
-       source activate py3
-       python setup.py install
-       source activate py2
-       rm -rf build
+       export CDAT_ANONYMOUS_LOG=False
+       source activate $PY_VER
        python setup.py install
 
   - &run_wk_tests
     name: run_wk_tests
     command: |
        export PATH=$WORKDIR/miniconda/bin:$PATH
-       export UVCDAT_ANONYMOUS_LOG=False
-       source activate py2
-       python run_tests.py -v2 -n 2 -H
+       export CDAT_ANONYMOUS_LOG=False
+       source activate $PY_VER
+       python run_tests.py -v 2 -n 2 -H $COVERAGE
        RESULT=$?
-       echo "*** py2 test result: "${RESULT}
-       source activate py3
-       python run_tests.py -n 2 -H $COVERAGE
-       PY3_RESULT=$?
-       echo "*** py3 test result: "${PY3_RESULT}
-       RESULT=$(( $RESULT + $PY3_RESULT))
+       echo "*** $PY_VER test result: "${RESULT}
        exit $RESULT
+
+  - &run_coveralls
+    name: run_coveralls
+    command: |
+       export PATH=$WORKDIR/miniconda/bin:$PATH
+       source activate $PY_VER
+       coveralls
+       source deactivate
 
   - &conda_upload
     name: conda_upload
     command: |
-       if [[ $CIRCLE_BRANCH != 'master' ]]; then
+       if [[ $CIRCLE_BRANCH != 'add_coverage' ]]; then
           exit 0
        fi
        export PATH=${HOME}/project/$WORKDIR/miniconda/bin:$PATH
@@ -67,26 +71,24 @@ aliases:
        export PKG_NAME=wk
        export USER=cdat
        export VERSION=8.0
-       export LABEL=nightly
-       python ./prep_for_build.py -l $VERSION
-       conda build $PKG_NAME -c cdat/label/nightly -c conda-forge -c cdat
+       export LABEL=linatest
+       python ./prep_for_build.py -l $VERSION -b 'add_coverage'
+       if [[ $PY_VER = 'py2' ]]; then
+          conda build $PKG_NAME $CHANNELS
+       else
+          conda build $PKG_NAME $CHANNELS --python=3.6
+       fi
        anaconda -t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL $CONDA_BLD_PATH/$OS/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
 
-  - &upload_coverage
-    name: upload_coverage
-    command: |
-       export PATH=$WORKDIR/miniconda/bin:$PATH
-       export UVCDAT_ANONYMOUS_LOG=False
-       source activate py3
-       coveralls
 
 jobs:
-  macos_wk:
+  macos_wk_py2:
     macos:
       xcode: "9.2.0"
     environment:
-      WORKDIR: "workspace/test_macos_wk"
+      WORKDIR: "workspace/test_macos_wk_py2"
       OS: "osx-64"
+      PY_VER: "py2"
     steps:
       - checkout
       - run: *setup_miniconda
@@ -101,20 +103,63 @@ jobs:
           path: tests_png
           destination: tests_png
 
-  linux_wk:
-    machine:
-      image: circleci/classic:latest 
+  macos_wk_py3:
+    macos:
+      xcode: "9.2.0"
     environment:
-      WORKDIR: "workspace/test_linux_wk"
-      OS: "linux-64"
-      COVERAGE: "-c"
+      WORKDIR: "workspace/test_macos_wk_py3"
+      OS: "osx-64"
+      PY_VER: "py3"
     steps:
       - checkout
       - run: *setup_miniconda
       - run: *create_conda_env
       - run: *setup_wk
       - run: *run_wk_tests
-      - run: *upload_coverage
+      - run: *conda_upload
+      - store_artifacts:
+          path: tests_html
+          destination: tests_html
+      - store_artifacts:
+          path: tests_png
+          destination: tests_png
+
+  linux_wk_py2:
+    machine:
+      image: circleci/classic:latest 
+    environment:
+      WORKDIR: "workspace/test_linux_wk_py2"
+      OS: "linux-64"
+      PY_VER: "py2"
+    steps:
+      - checkout
+      - run: *setup_miniconda
+      - run: *create_conda_env
+      - run: *setup_wk
+      - run: *run_wk_tests
+      - run: *conda_upload
+      - store_artifacts:
+          path: tests_html
+          destination: tests_html
+      - store_artifacts:
+          path: tests_png
+          destination: tests_png
+
+  linux_wk_py3:
+    machine:
+      image: circleci/classic:latest 
+    environment:
+      WORKDIR: "workspace/test_linux_wk_py3"
+      OS: "linux-64"
+      PY_VER: "py3"
+      COVERAGE: "-c tests/coverage.json"
+    steps:
+      - checkout
+      - run: *setup_miniconda
+      - run: *create_conda_env
+      - run: *setup_wk
+      - run: *run_wk_tests
+      - run: *run_coveralls
       - run: *conda_upload
       - store_artifacts:
           path: tests_html
@@ -128,7 +173,14 @@ workflows:
   version: 2
   wk:
     jobs:
-      - macos_wk
-      - linux_wk
+      - macos_wk_py2
+      - macos_wk_py3:
+           requires:
+              - macos_wk_py2
+      - linux_wk_py2
+      - linux_wk_py3:
+           requires:
+              - linux_wk_py2
+
 
        
