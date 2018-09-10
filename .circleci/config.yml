@@ -28,8 +28,7 @@ aliases:
        else
           conda create -q -n $PY_VER $CHANNELS $PKGS "python>3" coverage coveralls
        fi
-       conda install -n py2 -c cdat/label/linatest testsrunner
-       conda install -n py3 -c cdat/label/linatest testsrunner
+       conda install -n $PY_VER -c cdat/label/linatest testsrunner
 
   - &setup_wk
     name: setup_wk
