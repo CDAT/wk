@@ -15,6 +15,7 @@ aliases:
       
   - &create_conda_env
     name: create_conda_env
+    environment:
        PKGS: "cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs 'proj4<5'"
        CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
     command: |
