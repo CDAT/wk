@@ -59,6 +59,8 @@ aliases:
 
   - &conda_upload
     name: conda_upload
+    environment:
+       CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
     command: |
        if [[ $CIRCLE_BRANCH != 'add_coverage' ]]; then
           exit 0
