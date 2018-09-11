@@ -17,6 +17,7 @@ aliases:
     name: create_conda_env
     environment:
        PKGS: "cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs 'proj4<5'"
+       TEMPORARY_SETTINGS: "'ffmpeg>4'"
        CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
     command: |
        export PATH=$WORKDIR/miniconda/bin:$PATH
@@ -24,9 +25,9 @@ aliases:
        conda update -y -q conda
        conda config --set anaconda_upload no
        if [[ $PY_VER = 'py2' ]]; then
-          conda create -q -n $PY_VER $CHANNELS $PKGS "python<3"
+          conda create -q -n $PY_VER $CHANNELS $PKGS $TEMPORARY_SETTINGS "python<3"
        else
-          conda create -q -n $PY_VER $CHANNELS $PKGS "python>3" coverage coveralls
+          conda create -q -n $PY_VER $CHANNELS $PKGS $TEMPORARY_SETTINGS "python>3" coverage coveralls
        fi
        conda install -n $PY_VER -c cdat/label/linatest testsrunner
 
