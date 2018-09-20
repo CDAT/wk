@@ -1,0 +1,4 @@
+{
+   "include": ["WK", "cdms2", "cdutil", "vcs", "vtk", "cdat_info", "testsrunner"]
+}
+
