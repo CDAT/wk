@@ -91,7 +91,7 @@ jobs:
       WORKDIR: "workspace/test_macos_wk_py2"
       OS: "osx-64"
       PY_VER: "py2"
-      FFMPEG: "'ffmpeg>4'"
+      FFMPEG: "'ffmpeg>4' 'libpng>1.6.34'"
     steps:
       - checkout
       - run: *setup_miniconda
@@ -113,7 +113,7 @@ jobs:
       WORKDIR: "workspace/test_macos_wk_py3"
       OS: "osx-64"
       PY_VER: "py3"
-      FFMPEG: "'ffmpeg>4'"
+      FFMPEG: "'ffmpeg>4' 'libpng>1.6.34'"
     steps:
       - checkout
       - run: *setup_miniconda
