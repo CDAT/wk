@@ -17,7 +17,6 @@ aliases:
     name: create_conda_env
     environment:
        PKGS: "cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs 'proj4<5'"
-       TEMPORARY_SETTINGS: "'ffmpeg>4'"
        CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
     command: |
        export PATH=$WORKDIR/miniconda/bin:$PATH
@@ -25,11 +24,10 @@ aliases:
        conda update -y -q conda
        conda config --set anaconda_upload no
        if [[ $PY_VER = 'py2' ]]; then
-          conda create -q -n $PY_VER $CHANNELS $PKGS $TEMPORARY_SETTINGS "python<3"
+          conda create -q -n $PY_VER $CHANNELS $PKGS $FFMPEG "python<3"
        else
-          conda create -q -n $PY_VER $CHANNELS $PKGS $TEMPORARY_SETTINGS "python>3" coverage coveralls
+          conda create -q -n $PY_VER $CHANNELS $PKGS $FFMPEG "python>3" $COVERAGE_PKGS
        fi
-       conda install -n $PY_VER -c cdat/label/linatest testsrunner
 
   - &setup_wk
     name: setup_wk
@@ -62,6 +60,10 @@ aliases:
     name: conda_upload
     environment:
        CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
+       PKG_NAME: "wk"
+       USER: "cdat"
+       VERSION: "8.0"
+       LABEL: "linatest"
     command: |
        if [[ $CIRCLE_BRANCH != 'add_coverage' ]]; then
           exit 0
@@ -72,10 +74,6 @@ aliases:
        export CONDA_BLD_PATH=`pwd`/conda_build
        git clone git://github.com/cdat/conda-recipes
        cd conda-recipes
-       export PKG_NAME=wk
-       export USER=cdat
-       export VERSION=8.0
-       export LABEL=linatest
        python ./prep_for_build.py -l $VERSION -b 'add_coverage'
        if [[ $PY_VER = 'py2' ]]; then
           conda build $PKG_NAME $CHANNELS
@@ -93,6 +91,7 @@ jobs:
       WORKDIR: "workspace/test_macos_wk_py2"
       OS: "osx-64"
       PY_VER: "py2"
+      FFMPEG: "'ffmpeg>4'"
     steps:
       - checkout
       - run: *setup_miniconda
@@ -114,6 +113,7 @@ jobs:
       WORKDIR: "workspace/test_macos_wk_py3"
       OS: "osx-64"
       PY_VER: "py3"
+      FFMPEG: "'ffmpeg>4'"
     steps:
       - checkout
       - run: *setup_miniconda
@@ -135,6 +135,7 @@ jobs:
       WORKDIR: "workspace/test_linux_wk_py2"
       OS: "linux-64"
       PY_VER: "py2"
+      FFMPEG: "ffmpeg"
     steps:
       - checkout
       - run: *setup_miniconda
@@ -156,7 +157,9 @@ jobs:
       WORKDIR: "workspace/test_linux_wk_py3"
       OS: "linux-64"
       PY_VER: "py3"
+      FFMPEG: "ffmpeg"
       COVERAGE: "-c tests/coverage.json"
+      COVERAGE_PKGS: "coverage coveralls"
     steps:
       - checkout
       - run: *setup_miniconda
