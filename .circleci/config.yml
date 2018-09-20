@@ -43,7 +43,6 @@ aliases:
        export PATH=$WORKDIR/miniconda/bin:$PATH
        export CDAT_ANONYMOUS_LOG=False
        source activate $PY_VER
-       echo "CMD: python run_tests.py -v 2 -n 2 -H $COVERAGE"
        python run_tests.py -v 2 -n 2 -H $COVERAGE
        RESULT=$?
        echo "*** $PY_VER test result: "${RESULT}
