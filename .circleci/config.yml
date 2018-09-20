@@ -43,6 +43,7 @@ aliases:
        export PATH=$WORKDIR/miniconda/bin:$PATH
        export CDAT_ANONYMOUS_LOG=False
        source activate $PY_VER
+       echo "CMD: python run_tests.py -v 2 -n 2 -H $COVERAGE"
        python run_tests.py -v 2 -n 2 -H $COVERAGE
        RESULT=$?
        echo "*** $PY_VER test result: "${RESULT}
@@ -88,7 +89,7 @@ jobs:
     macos:
       xcode: "9.2.0"
     environment:
-      WORKDIR: "workspace/test_macos_wk_py2"
+      WORKDIR: "test_macos_wk_py2"
       OS: "osx-64"
       PY_VER: "py2"
       FFMPEG: "'ffmpeg>4' 'libpng>1.6.34'"
@@ -110,7 +111,7 @@ jobs:
     macos:
       xcode: "9.2.0"
     environment:
-      WORKDIR: "workspace/test_macos_wk_py3"
+      WORKDIR: "test_macos_wk_py3"
       OS: "osx-64"
       PY_VER: "py3"
       FFMPEG: "'ffmpeg>4' 'libpng>1.6.34'"
@@ -132,7 +133,7 @@ jobs:
     machine:
       image: circleci/classic:latest 
     environment:
-      WORKDIR: "workspace/test_linux_wk_py2"
+      WORKDIR: "test_linux_wk_py2"
       OS: "linux-64"
       PY_VER: "py2"
       FFMPEG: "ffmpeg"
@@ -154,12 +155,12 @@ jobs:
     machine:
       image: circleci/classic:latest 
     environment:
-      WORKDIR: "workspace/test_linux_wk_py3"
+      WORKDIR: "test_linux_wk_py3"
       OS: "linux-64"
       PY_VER: "py3"
       FFMPEG: "ffmpeg"
-      # COVERAGE: "-c tests/coverage.json --coverage-from-repo"
-      # COVERAGE_PKGS: "coverage coveralls"
+      COVERAGE: "-c tests/coverage.json"
+      COVERAGE_PKGS: "coverage coveralls"
     steps:
       - checkout
       - run: *setup_miniconda
