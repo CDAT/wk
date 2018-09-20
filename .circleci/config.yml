@@ -180,15 +180,14 @@ workflows:
   version: 2
   wk:
     jobs:
-      #- macos_wk_py2
-      #- macos_wk_py3:
-      #     requires:
-      #        - macos_wk_py2
-      #- linux_wk_py2
-      #- linux_wk_py3:
-      #     requires:
-      #        - linux_wk_py2
-      - linux_wk_py3
+      - macos_wk_py2
+      - macos_wk_py3:
+           requires:
+              - macos_wk_py2
+      - linux_wk_py2
+      - linux_wk_py3:
+           requires:
+              - linux_wk_py2
 
 
        
