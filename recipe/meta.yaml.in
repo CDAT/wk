@@ -1,0 +1,27 @@
+package:
+    name: wk
+    version: "@VERSION@"
+
+source:
+    git_rev: @UVCDAT_BRANCH@
+    git_url: git://github.com/cdat/wk.git
+
+build:
+  number: @BUILD_NUMBER@
+ 
+requirements:
+  build:
+    - python {{ python }}
+    - setuptools
+  run:
+    - python {{ python }}
+    - cdms2
+    - vcs
+
+about:
+    home:  http://github.com/cdat/wk
+    summary: Package to compute and draw the Wheeler-Kiladis figures.
+    license: BSD
+    license_file: bsd-3-clause.txt
+
+

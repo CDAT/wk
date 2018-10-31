@@ -74,6 +74,10 @@ aliases:
        export CONDA_BLD_PATH=`pwd`/conda_build
        git clone git://github.com/cdat/conda-recipes
        cd conda-recipes
+       if [[ -d $PKG_NAME ]]; then
+          rm -rf $PKG_NAME
+       fi
+       ln -s ../recipe $PKG_NAME
        python ./prep_for_build.py -l $VERSION
        if [[ $PY_VER = 'py2' ]]; then
           conda build $PKG_NAME $CHANNELS
