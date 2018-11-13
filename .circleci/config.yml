@@ -79,12 +79,8 @@ aliases:
        fi
        ln -s ../recipe $PKG_NAME
        python ./prep_for_build.py -l $VERSION
-       if [[ $PY_VER = 'py2' ]]; then
-          conda build $PKG_NAME $CHANNELS
-       else
-          conda build $PKG_NAME $CHANNELS --python=3.6
-       fi
-       anaconda -t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL $CONDA_BLD_PATH/$OS/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
+       conda build $PKG_NAME $CHANNELS --python=3.6
+       anaconda -t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL $CONDA_BLD_PATH/noarch/$PKG_NAME-$VERSION.`date +%Y*`0.tar.bz2 --force
 
 
 jobs:
@@ -102,7 +98,6 @@ jobs:
       - run: *create_conda_env
       - run: *setup_wk
       - run: *run_wk_tests
-      - run: *conda_upload
       - store_artifacts:
           path: tests_html
           destination: tests_html
@@ -124,7 +119,6 @@ jobs:
       - run: *create_conda_env
       - run: *setup_wk
       - run: *run_wk_tests
-      - run: *conda_upload
       - store_artifacts:
           path: tests_html
           destination: tests_html
@@ -146,7 +140,6 @@ jobs:
       - run: *create_conda_env
       - run: *setup_wk
       - run: *run_wk_tests
-      - run: *conda_upload
       - store_artifacts:
           path: tests_html
           destination: tests_html
@@ -162,7 +155,7 @@ jobs:
       OS: "linux-64"
       PY_VER: "py3"
       FFMPEG: "ffmpeg"
-      COVERAGE: "-c tests/coverage.json"
+      COVERAGE: "-c tests/coverage.json --coverage-from-egg"
       COVERAGE_PKGS: "coverage coveralls"
     steps:
       - checkout
