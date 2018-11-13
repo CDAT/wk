@@ -20,7 +20,7 @@ except:
 
 
 setup (name = "WK",
-       version='8.0',
+       version=descr,
        description = "Package to compute and draw the Wheeler-Kiladis figures",
        url = "http://cdat.sf.net, see WK 99",
        packages = find_packages(),
