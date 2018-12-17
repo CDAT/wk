@@ -16,7 +16,7 @@ aliases:
   - &create_conda_env
     name: create_conda_env
     environment:
-       PKGS: "cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs 'proj4<5'"
+       PKGS: "cdms2 cdat_info testsrunner  mesalib matplotlib numpy=1.14 vcs 'proj4<5' 'vtk-cdat>8.1'"
        CHANNELS: "-c cdat/label/nightly -c conda-forge -c cdat"
     command: |
        export PATH=$WORKDIR/miniconda/bin:$PATH
