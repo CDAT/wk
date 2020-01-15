@@ -242,10 +242,9 @@ workflows:
                  - linux_setup
          - upload:
               requires:
-                 #- macos_wk_py2
-                 #- macos_wk_py37
-                 #- linux_wk_py2
-                 #- linux_wk_py37
-                 - macos_setup
-                 - linux_setup
+                 - macos_wk_py2
+                 - macos_wk_py37
+                 - linux_wk_py2
+                 - linux_wk_py37
+
  
