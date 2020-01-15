@@ -57,9 +57,9 @@ aliases:
   - &conda_upload
     name: conda_upload
     command: |
-       if [[ $CIRCLE_BRANCH != "master" ]]; then
-          exit 0
-       fi
+       #if [[ $CIRCLE_BRANCH != "master" ]]; then
+       #   exit 0
+       #fi
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
        UPLOAD_OPTIONS="-t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL"
@@ -242,7 +242,10 @@ workflows:
                  - linux_setup
          - upload:
               requires:
-                 - macos_wk_py2
-                 - macos_wk_py37
-                 - linux_wk_py2
-                 - linux_wk_py37
+                 #- macos_wk_py2
+                 #- macos_wk_py37
+                 #- linux_wk_py2
+                 #- linux_wk_py37
+                 - macos_setup
+                 - linux_setup
+ 
