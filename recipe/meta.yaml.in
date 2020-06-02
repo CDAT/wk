@@ -17,8 +17,8 @@ requirements:
     - setuptools
   run:
     - python
-    - cdutil
     - cdms2
+    - vcs
 
 about:
     home:  http://github.com/cdat/wk
