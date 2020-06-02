@@ -62,9 +62,6 @@ aliases:
   - &conda_upload
     name: conda_upload
     command: |
-       #if [[ $CIRCLE_BRANCH != "master" ]]; then
-       #   exit 0
-       #fi
        source $WORKDIR/miniconda/etc/profile.d/conda.sh
        conda activate base
        UPLOAD_OPTIONS="-t $CONDA_UPLOAD_TOKEN upload -u $USER -l $LABEL"
@@ -243,8 +240,8 @@ jobs:
          PKG_NAME: "wk"
          ENV_NAME: "test_wk"
          CONDA_PY_VER: "python>=3.7,<3.8"
-         #COVERAGE: "-c tests/coverage.json --coverage-from-egg"
-         #COVERAGE_PKGS: "coverage coveralls"
+         COVERAGE: "-c tests/coverage.json --coverage-from-egg"
+         COVERAGE_PKGS: "coverage coveralls"
          LIBNETCDF: "libnetcdf=*=nompi_*"
       steps:
          - checkout
@@ -253,7 +250,7 @@ jobs:
          - run: *setup_run_tests
          - run: *get_testdata
          - run: *run_tests
-         #- run: *run_coveralls
+         - run: *run_coveralls
          - store_artifacts:
               path: tests_html
               destination: tests_html
@@ -580,21 +577,6 @@ jobs:
               at: .
          - run: *conda_upload
 
-   upload_MACOS:
-      macos:
-         xcode: "11.4.0"
-      environment:
-         WORKDIR: /Users/distiller/project/macos_build
-         PKG_NAME: "wk"
-         VERSION: "8.2"
-         USER: "cdat"
-         LABEL: "nightly"
-         #LABEL: "debug"
-      steps:
-         - attach_workspace:
-              at: .
-         - run: *conda_upload
-
 workflows:
    version: 2
    wk:
@@ -680,3 +662,6 @@ workflows:
                  - linux_wk_openmpi_py36
                  - linux_wk_openmpi_py37
                  - linux_wk_openmpi_py38
+              filters:
+                 branches:
+                    only: master
