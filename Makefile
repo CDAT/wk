@@ -6,6 +6,10 @@ SHELL = /bin/bash
 
 os = $(shell uname)
 pkg_name = wk
+
+user ?= cdat
+label ?= nightly
+
 build_script = conda-recipes/build_tools/conda_build.py
 
 #
@@ -20,34 +24,50 @@ endif
 
 last_stable ?= 8.2
 
-conda_env ?= base
-workdir ?= $(PWD)/workspace
+conda_test_env = test-$(pkg_name)
+conda_build_env = build-$(pkg_name)
+
 branch ?= $(shell git rev-parse --abbrev-ref HEAD)
 extra_channels ?= cdat/label/nightly conda-forge
 conda ?= $(or $(CONDA_EXE),$(shell find /opt/*conda*/bin $(HOME)/*conda* -type f -iname conda))
-artifact_dir ?= $(PWD)/artifacts
 conda_env_filename ?= spec-file
+
+# Only populate if workdir is not defined
+ifeq ($(origin workdir),undefined)
+# Create .tempdir if it doesn't exist
+ifeq ($(wildcard $(PWD)/.tempdir),)
+workdir := $(shell mktemp -d -t "build_$(pkg_name).XXXXXXXX")
+$(shell echo $(workdir) > $(PWD)/.tempdir)
+endif
+
+# Read tempdir
+workdir := $(shell cat $(PWD)/.tempdir)
+endif
+
+artif_dir = $(workdir)/$(artifact_dir)
 
 ifeq ($(coverage),1)
 coverage_opt = -c tests/coverage.json --coverage-from-egg
 endif
 
-conda_recipes_branch ?= master
+# TODO -- replace with 'master' after branch is merged
+# conda_recipes_branch ?= master
+conda_recipes_branch ?= update_for_release
 
 conda_base = $(patsubst %/bin/conda,%,$(conda))
 conda_activate = $(conda_base)/bin/activate
 
-conda_build_extra = --copy_conda_package $(artifact_dir)/
+conda_build_extra = --copy_conda_package $(artif_dir)/
 
 ifndef $(local_repo)
 local_repo = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 endif
 
 conda-info:
-	source $(conda_activate) $(conda_env); conda info
+	source $(conda_activate) $(conda_test_env); conda info
 
 conda-list:
-	source $(conda_activate) $(conda_env); conda list
+	source $(conda_activate) $(conda_test_env); conda list
 
 setup-build:
 ifeq ($(wildcard $(workdir)/conda-recipes),)
@@ -57,30 +77,31 @@ else
 endif
 
 setup-tests:
-	source $(conda_activate) base; conda create -y -n $(conda_env) --use-local \
+	source $(conda_activate) base; conda create -y -n $(conda_test_env) --use-local \
 		$(foreach x,$(extra_channels),-c $(x)) $(pkg_name) $(foreach x,$(test_pkgs),"$(x)") \
 		$(foreach x,$(docs_pkgs),"$(x)") $(foreach x,$(pkgs),"$(x)") $(foreach x,$(extra_pkgs),"$(x)")
 
 conda-rerender: setup-build 
 	python $(workdir)/$(build_script) -w $(workdir) -l $(last_stable) -B 0 -p $(pkg_name) \
-		-b $(branch) --do_rerender --conda_env $(conda_env) --ignore_conda_missmatch \
-		--conda_activate $(conda_activate)
+		-b $(branch) --do_rerender --conda_env $(conda_build_env) --ignore_conda_missmatch \
+		--conda_activate $(conda_activate) --local_repo $(local_repo)
 
 conda-build:
 	mkdir -p $(artifact_dir)
 
 	python $(workdir)/$(build_script) -w $(workdir) -p $(pkg_name) --build_version noarch \
-		--do_build --conda_env $(conda_env) --extra_channels $(extra_channels) \
-		--conda_activate $(conda_activate) $(conda_build_extra)
+		--do_build --conda_env $(conda_build_env) --extra_channels $(extra_channels) \
+		--conda_activate $(conda_activate) $(conda_build_extra) \
+		--local_repo $(local_repo)
 
 conda-upload:
-	source $(conda_activate) $(conda_env); \
+	source $(conda_activate) $(conda_build_env); \
 		anaconda -t $(conda_upload_token) upload -u $(user) -l $(label) --force $(artifact_dir)/*.tar.bz2
 
 conda-dump-env:
 	mkdir -p $(artifact_dir)
 
-	source $(conda_activate) $(conda_env); conda list --explicit > $(artifact_dir)/$(conda_env_filename).txt
+	source $(conda_activate) $(conda_test_env); conda list --explicit > $(artifact_dir)/$(conda_env_filename).txt
 
 get-testdata:
 ifeq ($(wildcard uvcdat-testdata),)
@@ -90,7 +111,7 @@ else
 endif
 
 run-tests:
-	source $(conda_activate) $(conda_env); python run_tests.py -H -v2 -n 2 $(coverage_opt)
+	source $(conda_activate) $(conda_test_env); python run_tests.py -H -v2 -n 2 $(coverage_opt)
 
 run-coveralls:
-	source $(conda_activate) $(conda_env); coveralls;
+	source $(conda_activate) $(conda_test_env); coveralls;
