@@ -87,7 +87,7 @@ conda-rerender: setup-build
 		--conda_activate $(conda_activate) --local_repo $(local_repo)
 
 conda-build:
-	mkdir -p $(artifact_dir)
+	mkdir -p $(artif_dir)
 
 	python $(workdir)/$(build_script) -w $(workdir) -p $(pkg_name) --build_version noarch \
 		--do_build --conda_env $(conda_build_env) --extra_channels $(extra_channels) \
@@ -96,7 +96,7 @@ conda-build:
 
 conda-upload:
 	source $(conda_activate) $(conda_build_env); \
-		anaconda -t $(conda_upload_token) upload -u $(user) -l $(label) --force $(artifact_dir)/*.tar.bz2
+		anaconda -t $(conda_upload_token) upload -u $(user) -l $(label) --force $(artif_dir)/*.tar.bz2
 
 conda-dump-env:
 	mkdir -p $(artifact_dir)
