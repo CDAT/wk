@@ -1,5 +1,5 @@
 .PHONY: conda-info conda-list setup-build setup-tests conda-rerender \
-	conda-build conda-upload conda-dump-env get_testdata \
+	conda-build conda-upload conda-dump-env get-testdata \
 	run-tests run-coveralls
 
 SHELL = /bin/bash
@@ -44,7 +44,7 @@ endif
 workdir := $(shell cat $(PWD)/.tempdir)
 endif
 
-artif_dir = $(workdir)/$(artifact_dir)
+artifact_dir ?= $(PWD)/artifacts
 
 ifeq ($(coverage),1)
 coverage_opt = -c tests/coverage.json --coverage-from-egg
@@ -57,7 +57,7 @@ conda_recipes_branch ?= update_for_release
 conda_base = $(patsubst %/bin/conda,%,$(conda))
 conda_activate = $(conda_base)/bin/activate
 
-conda_build_extra = --copy_conda_package $(artif_dir)/
+conda_build_extra = --copy_conda_package $(artifact_dir)/
 
 ifndef $(local_repo)
 local_repo = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
@@ -84,19 +84,18 @@ setup-tests:
 conda-rerender: setup-build 
 	python $(workdir)/$(build_script) -w $(workdir) -l $(last_stable) -B 0 -p $(pkg_name) \
 		-b $(branch) --do_rerender --conda_env $(conda_build_env) --ignore_conda_missmatch \
-		--conda_activate $(conda_activate) --local_repo $(local_repo)
+		--conda_activate $(conda_activate)
 
 conda-build:
-	mkdir -p $(artif_dir)
+	mkdir -p $(artifact_dir)
 
 	python $(workdir)/$(build_script) -w $(workdir) -p $(pkg_name) --build_version noarch \
 		--do_build --conda_env $(conda_build_env) --extra_channels $(extra_channels) \
-		--conda_activate $(conda_activate) $(conda_build_extra) \
-		--local_repo $(local_repo)
+		--conda_activate $(conda_activate) $(conda_build_extra)
 
 conda-upload:
 	source $(conda_activate) $(conda_build_env); \
-		anaconda -t $(conda_upload_token) upload -u $(user) -l $(label) --force $(artif_dir)/*.tar.bz2
+		anaconda -t $(conda_upload_token) upload -u $(user) -l $(label) --force $(artifact_dir)/*.tar.bz2
 
 conda-dump-env:
 	mkdir -p $(artifact_dir)
