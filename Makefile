@@ -50,9 +50,7 @@ ifeq ($(coverage),1)
 coverage_opt = -c tests/coverage.json --coverage-from-egg
 endif
 
-# TODO -- replace with 'master' after branch is merged
-# conda_recipes_branch ?= master
-conda_recipes_branch ?= update_for_release
+conda_recipes_branch ?= master
 
 conda_base = $(patsubst %/bin/conda,%,$(conda))
 conda_activate = $(conda_base)/bin/activate
