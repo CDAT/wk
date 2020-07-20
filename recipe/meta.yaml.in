@@ -1,13 +1,13 @@
 package:
     name: wk
-    version: "@VERSION@"
+    version: "8.2.1.rc1"
 
 source:
-    git_rev: @UVCDAT_BRANCH@
-    git_url: git://github.com/cdat/wk.git
+  url: https://github.com/CDAT/wk/archive/v8.2.1.rc1.tar.gz
+  sha256: 0b672bb7b0cf064e49fea078acde6d7428a7127635ba43747582d0440bcb741b
 
 build:
-  number: @BUILD_NUMBER@
+  number: 0
   noarch: python
   script: python setup.py install
  
